@@ -1,37 +1,54 @@
 /* eslint-disable prettier/prettier */
-import {StyleSheet, StatusBar} from 'react-native';
+import {StyleSheet} from 'react-native';
 
 const styles = StyleSheet.create({
-  buttonCleanList: {
-    width: 120,
-    height: 50,
+  saveAndClearList: {
+    width: 100,
+    height: 60,
+    flexDirection: 'row',
+    paddingLeft: 1,
   },
   buttonDeleteItem: {
     width: 19,
     height: 19,
   },
+  listNameText: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    marginVertical: 10,
+    paddingLeft: 5,
+    textAlign: 'left',
+  },
+  inputNameList: {
+    borderColor: 'gray',
+    borderWidth: 1,
+    padding: 10,
+    margin: 5,
+  },
   viewInputs: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: StatusBar.currentHeight,
   },
   inputQuantity: {
     flex: 1,
     height: 40,
-    borderColor: 'gray',
+    textAlign: 'center',
+    borderColor: 'lightgray',
     borderWidth: 1,
     margin: 5,
   },
   inputName: {
     flex: 5,
     height: 40,
-    borderColor: 'gray',
+    borderColor: 'lightgray',
     borderWidth: 1,
     margin: 5,
+    paddingLeft: 1,
   },
   button: {
-    padding: 11,
+    padding: 5,
     margin: 5,
+    alignItems: 'center',
     backgroundColor: 'lightgray',
   },
   buttonText: {
@@ -39,13 +56,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   tableList: {
-    marginTop: 10,
+
   },
   tableRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
+    borderBottomWidth: 0.5,
     borderColor: 'lightgray',
+    alignItems: 'center',
     padding: 5,
   },
   tableCell: {
@@ -54,6 +71,8 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     marginHorizontal: 5,
+    borderWidth: 1,
+    borderColor: 'lightgray',
     height: '70%',
   },
   line: {
@@ -64,6 +83,13 @@ const styles = StyleSheet.create({
     fontFamily: 'System',
     fontStyle: 'italic',
     fontSize: 20,
+    paddingLeft: 10,
+    paddingRight: 10,
+  },
+  label: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    fontSize: 5,
   },
 });
 

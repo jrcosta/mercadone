@@ -1,5 +1,5 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, {useState, useRef} from 'react';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import styles from './styles';
 import {
   View,
@@ -8,37 +8,59 @@ import {
   Text,
   ScrollView,
   Alert,
-  Image,
+  Modal,
 } from 'react-native';
 
 const Inputs = () => {
   const [list, setList] = useState<{text: string; number: string}[]>([]);
   const [text, setText] = useState('');
+  const [listName, setListName] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
   const [number, setNumber] = useState('1');
   const inputNameRef = useRef<TextInput>(null);
   const inputNumberRef = useRef<TextInput>(null);
+  const inputNameListRef = useRef<TextInput>(null);
+  const [contador, setContador] = useState(1);
 
-  const adicionarItem = () => {
+  const addItem = () => {
+    console.log('addItem chamado com text: ', text, 'e number: ', number);
     let floatNumber = parseFloat(number.replace(/[^0-9.-]+/g, ''));
     if (text.length < 2) {
       Alert.alert('O campo nome deve ter no mínimo 2 caracteres.');
       return;
-    } else if (floatNumber === 0 || isNaN(floatNumber)) {
+    } else if (floatNumber === 0 || isNaN(floatNumber) || floatNumber < 0) {
       Alert.alert('A quantidade não pode ser igual a Zero ou Vazia.');
       if (inputNumberRef.current) {
+        setNumber('1');
         inputNumberRef.current.focus();
       }
       return;
     }
+
     setList([...list, {text, number: String(floatNumber)}]);
     setText('');
     setNumber('1');
-    if (inputNameRef.current) {
-      inputNameRef.current.focus();
+
+    if (list.length === 0) {
+      setModalVisible(true);
+      inputNameListRef.current?.focus();
+      return;
     }
   };
 
-  const atualizaQuantidade = (index: number, newNumber: any) => {
+  const handleModalSubmit = (listNameUser: string) => {
+    let nomeLista;
+    if (listNameUser.length === 0) {
+      setContador(contador + 1);
+      nomeLista = 'Lista' + contador;
+    } else {
+      nomeLista = listNameUser;
+    }
+    setListName(nomeLista.toUpperCase());
+    setModalVisible(false);
+  };
+
+  const updateQuantity = (index: number, newNumber: any) => {
     const newList = [...list];
     newList[index].number = newNumber;
     if (newNumber === 0) {
@@ -49,9 +71,10 @@ const Inputs = () => {
 
   const handleClear = () => {
     setList([]);
+    setListName('');
   };
 
-  const deletarItem = (index: number) => {
+  const deleteItem = (index: number) => {
     const newList = [...list];
     newList.splice(index, 1);
     setList(newList);
@@ -59,72 +82,81 @@ const Inputs = () => {
 
   return (
     <View>
-      <View style={styles.line} />
-      <Text style={styles.logo}>MercaDONE</Text>
-      <View style={styles.line} />
+      <View>
+        <Text style={styles.listNameText}>Nome da Lista: {listName}</Text>
+      </View>
       <View style={styles.viewInputs}>
         <TextInput
+          placeholder="Ex: Coca-Cola"
           ref={inputNameRef}
           value={text}
           onChangeText={setText}
           style={styles.inputName}
         />
         <TextInput
-          ref={inputNumberRef}
           keyboardType="numeric"
           value={number}
           onChangeText={setNumber}
           style={styles.inputQuantity}
           maxLength={4}
         />
-
-        <TouchableOpacity onPress={adicionarItem} style={styles.button}>
-          <Text style={styles.buttonText}>+</Text>
+        <TouchableOpacity onPress={addItem} style={styles.button}>
+          <Icon name="plus" size={30} color="#999" />
         </TouchableOpacity>
       </View>
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}>
+        <View>
+          <TextInput
+            placeholder="Nome da lista"
+            ref={inputNameListRef}
+            value={listName}
+            onChangeText={setListName}
+            style={styles.inputNameList}
+          />
+          <TouchableOpacity
+            onPress={() => handleModalSubmit(listName)}
+            style={styles.button}>
+            <Text>Enviar</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
       <ScrollView style={styles.scrollView}>
         <View style={styles.tableList}>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <View style={{paddingLeft: 5}}>
-              <Text>Produto</Text>
-            </View>
-            <View style={{paddingRight: 195}}>
-              <Text>Quantidade</Text>
-            </View>
-          </View>
           {list.map((item, index) => (
             <View style={styles.tableRow} key={index}>
               <Text style={styles.tableCell}>{item.text}</Text>
               <Text style={styles.tableCell}>{item.number}</Text>
               <TouchableOpacity
-                onPress={() =>
-                  atualizaQuantidade(index, Number(item.number) + 1)
-                }
+                onPress={() => updateQuantity(index, Number(item.number) + 1)}
                 style={styles.button}>
-                <Text style={styles.buttonText}>+</Text>
+                <Icon name="plus" size={18} color="#999" />
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() =>
-                  atualizaQuantidade(index, Number(item.number) - 1)
-                }
+                onPress={() => updateQuantity(index, Number(item.number) - 1)}
                 style={styles.button}>
-                <Text style={styles.buttonText}>-</Text>
+                <Icon name="minus" size={18} color="#999" />
               </TouchableOpacity>
               <TouchableOpacity
-                onPress={() => deletarItem(index)}
+                onPress={() => deleteItem(index)}
                 style={styles.button}>
-                <Image
-                  source={require('./lixeira.png')}
-                  style={styles.buttonDeleteItem}
-                />
+                <Icon name="trash" size={18} color="#999" />
               </TouchableOpacity>
             </View>
           ))}
         </View>
       </ScrollView>
-      <View style={styles.buttonCleanList}>
+      <View style={styles.saveAndClearList}>
         <TouchableOpacity onPress={handleClear} style={styles.button}>
-          <Text style={styles.buttonText}>Limpar Lista</Text>
+          <Icon name="trash" size={25} color="#999" />
+          <Text>Lista</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleClear} style={styles.button}>
+          <Icon name="save" size={25} color="#999" />
+          <Text>Lista</Text>
         </TouchableOpacity>
       </View>
     </View>
